@@ -4,6 +4,7 @@ let mongoose = require('mongoose'),
 let agencySchema = new Schema({
   name: String, // LEA name
   address: String, // City, ST
+  city: String,
   geolocation: { // Lat, Lon of address
     type: {
       type: String,

@@ -13,112 +13,86 @@ let mongoose = require("mongoose"),
 const DB_URL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/ring-lea';
 
 // ** CONNECT TO DB **
-// mongoose.connect(DB_URL, function(err, res) {
-//   if(err) console.log("ERROR connecting to database");
-//   else console.log("SUCCESSfully connected to database");
-// });
+mongoose.connect(DB_URL, function(err, res) {
+  if(err) console.log("ERROR connecting to database");
+  else console.log("SUCCESSfully connected to database");
+});
 
-function getCoords(address, callback){
-  request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
+function getCoords(data, i, callback){ // Geocode a list of addresses
+  request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
       let coords = JSON.parse(body).results[0].geometry.location;
-      callback([coords.lat, coords.lng]);
+
+      data[i].geolocation = {type: 'Point', coordinates: [coords.lat, coords.lng]}
+
+      if(i < data.length - 1) getCoords(data, i + 1, callback);
+      else callback();
     });
 }
 
 // // ** COLLECT DATA **
+
+// 1) Grab all LEA from the Ring website
+
+function getData(callback){
+  request('https://www.google.com/maps/d/kml?forcekml=1&mid=1eYVDPh5itXq5acDT9b0BVeQwmESBa4cB&lid=yvtnOP7RJZU', function (error, response, body) {
+    if(error) callback(null);
+    else callback(JSON.parse(convert.xml2json(body, {compact: true})).kml.Document.Placemark);
+  });
+}
+
+
+getData(function(newData){
+
+  // 2) Grab all existing LEA from database
+  let oldLEA = new Set(),
+      newLEA = new Set();
+
+  let update = [],
+      insert = [];
+
+  Agency.find({}, function(err, oldData){
+    oldData.forEach((agency) => {oldLEA.add(agency.name);});
+
+    // 3) Iterate through new data
+    newData.slice(1, 3).forEach(function(agency, i){
+      let name = agency.name._text,
+          address = agency.address._text,
+          state = address.split(", ")[1],
+          videoRequests = parseInt(agency.ExtendedData.Data[2].value._text); //TODO: deal with quarter
+
+      newLEA.add(name);
+
+      // If this agency already exists in dataset
+      if(oldLEA.has(name)) update.push({
+        name: name,
+        videoRequests: videoRequests
+      });
+
+      // Otherwise, create new object
+      else insert.push({
+        name: name,
+        address: address,
+        state: state,
+        activeDate: new Date(agency.ExtendedData.Data[1].value._text),
+        deactivateDate: null,
+        videoRequests: videoRequests
+      });
+    });
+
+    // 4) Geocode all new data
+    console.log(insert);
+    getCoords(insert, 0, function(){
+      console.log(insert);
+    })
+
+
+    // 5) Check for LEA which have been deleted
+
+  });
+
+})
+
 //
-// // 1) Grab all LEA from the Ring website
-//
-// function getData(callback){
-//   request('https://www.google.com/maps/d/kml?forcekml=1&mid=1eYVDPh5itXq5acDT9b0BVeQwmESBa4cB&lid=yvtnOP7RJZU', function (error, response, body) {
-//     if(error) callback(null);
-//     else callback(JSON.parse(convert.xml2json(body, {compact: true})).kml.Document.Placemark);
-//   });
-// }
-//
-// {type: 'Point', coordinates: [parseFloat(coords[0]), parseFloat(coords[1])] }
-//
-// getData(function(newData){
-//
-//   // 2) Grab all existing LEA from database
-//   let oldLEA = new Set(),
-//       newLEA = new Set();
-//
-//   let update = [],
-//       insert = [];
-//
-//   Agency.find({}, function(err, oldData){
-//     oldData.forEach((agency) => {oldLEA.add(agency.name);});
-//
-//     newData.forEach(function(agency){
-//       let name = agency.name._text,
-//           videoRequests = parseInt(agency.ExtendedData.Data[2].value._text); //TODO: deal with quarter
-//
-//
-//       newLEA.add(name);
-//
-//       // If this agency already exists in dataset
-//       if(oldLEA.has(name)) update.push({
-//         name: name,
-//         videoRequests: videoRequests
-//       })
-//       else insert.push({
-//         name: name,
-//         address: agency.address._text,
-//         geolocation: TODO,
-//         activeDate: new Date(agency.ExtendedData.Data[1].value._text),
-//         deactivateDate: null,
-//         videoRequests: videoRequests
-//       });
-//
-//
-//
-//     });
-//
-//
-//   });
-//
-// })
-//
-//
-//
-//
-//
-//
-// //
-// // // // 2) Check for obsolete LEAs: if an object exists in the database but not in the new data, the contract is down
 // // //
-// //
-// //
-// // // Bulk Upsert data
-// //
-// // getData(function(data){
-// //   console.log(JSON.stringify(data[0]));
-// //
-// //
-// // mongoose.connection.on("open", function(err,conn) {
-// //
-// //    var bulk = Sample.collection.initializeOrderedBulkOp();
-// //    var counter = 0;
-// //
-// //    // representing a long loop
-// //    for ( var x = 0; x < 100000; x++ ) {
-// //
-// //        bulk.find(/* some search */).upsert().updateOne(
-// //            /* update conditions */
-// //        });
-// //        counter++;
-// //
-// //        if ( counter % 1000 == 0 )
-// //            bulk.execute(function(err,result) {
-// //                bulk = Sample.collection.initializeOrderedBulkOp();
-// //            });
-// //    }
-// //
-// //    if ( counter % 1000 != 0 )
-// //        bulk.execute(function(err,result) {
-// //           // maybe do something with result
-// //        });
-// //
-// // });
-// // })
+// // // // // 2) Check for obsolete LEAs: if an object exists in the database but not in the new data, the contract is down
+// // // //
