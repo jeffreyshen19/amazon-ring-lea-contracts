@@ -18,17 +18,6 @@ mongoose.connect(DB_URL, function(err, res) {
   else console.log("SUCCESSfully connected to database");
 });
 
-function getCoords(data, i, callback){ // Geocode a list of addresses
-  request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
-      let coords = JSON.parse(body).results[0].geometry.location;
-
-      data[i].geolocation = {type: 'Point', coordinates: [coords.lat, coords.lng]}
-
-      if(i < data.length - 1) getCoords(data, i + 1, callback);
-      else callback();
-    });
-}
-
 // // ** COLLECT DATA **
 
 // 1) Grab all LEA from the Ring website
@@ -54,7 +43,7 @@ getData(function(newData){
     oldData.forEach((agency) => {oldLEA.add(agency.name);});
 
     // 3) Iterate through new data
-    newData.slice(1, 3).forEach(function(agency, i){
+    newData.slice(1, 4).forEach(function(agency, i){
       let name = agency.name._text,
           address = agency.address._text,
           state = address.split(", ")[1],
@@ -80,11 +69,29 @@ getData(function(newData){
     });
 
     // 4) Geocode all new data
-    console.log(insert);
-    getCoords(insert, 0, function(){
-      console.log(insert);
-    })
+    function getCoords(data, i, callback){
+      if(!data.length) callback();
+      else request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
+          let coords = JSON.parse(body).results[0].geometry.location;
 
+          data[i].geolocation = {type: 'Point', coordinates: [coords.lat, coords.lng]}
+
+          if(i < data.length - 1) getCoords(data, i + 1, callback);
+          else callback();
+        });
+    }
+
+    getCoords(insert, 0, function(){
+      // 5) Add to database
+      function bulkUpdate(data, i){
+        Agency.findOneAndUpdate({name: data[i].name}, {videoRequests: data[i].videoRequests}, {new: true}, function(err, doc){
+          if(i < data.length - 1) bulkUpdate(data, i + 1);
+        });
+      }
+
+      if(insert.length) Agency.insertMany(insert);
+      if(update.length) bulkUpdate(update, 0);
+    })
 
     // 5) Check for LEA which have been deleted
 
