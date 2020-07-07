@@ -43,10 +43,11 @@ getData(function(newData){
     oldData.forEach((agency) => {oldLEA.add(agency.name);});
 
     // 3) Iterate through new data
-    newData.slice(1, 4).forEach(function(agency, i){
+    newData.slice(1, 3).forEach(function(agency, i){
       let name = agency.name._text,
           address = agency.address._text,
           state = address.split(", ")[1],
+          activeDate = new Date(agency.ExtendedData.Data[1].value._text),
           videoRequests = parseInt(agency.ExtendedData.Data[2].value._text); //TODO: deal with quarter
 
       newLEA.add(name);
@@ -54,7 +55,7 @@ getData(function(newData){
       // If this agency already exists in dataset
       if(oldLEA.has(name)) update.push({
         name: name,
-        videoRequests: videoRequests
+        videoRequests: videoRequests,
       });
 
       // Otherwise, create new object
@@ -62,7 +63,7 @@ getData(function(newData){
         name: name,
         address: address,
         state: state,
-        activeDate: new Date(agency.ExtendedData.Data[1].value._text),
+        activeDate: activeDate,
         deactivateDate: null,
         videoRequests: videoRequests
       });
@@ -84,7 +85,7 @@ getData(function(newData){
     getCoords(insert, 0, function(){
       // 5) Add to database
       function bulkUpdate(data, i){
-        Agency.findOneAndUpdate({name: data[i].name}, {videoRequests: data[i].videoRequests}, {new: true}, function(err, doc){
+        Agency.findOneAndUpdate({name: data[i].name}, {videoRequests: data[i].videoRequests, deactivateDate: null}, {new: true}, function(err, doc){
           if(i < data.length - 1) bulkUpdate(data, i + 1);
         });
       }
@@ -93,13 +94,11 @@ getData(function(newData){
       if(update.length) bulkUpdate(update, 0);
     })
 
-    // 5) Check for LEA which have been deleted
+    // 6) Check for LEA which have been deleted
+    oldData.forEach(function(d){
+      if(!newLEA.has(d.name)) Agency.findOneAndUpdate({name: d.name}, {deactivateDate: new Date()}, {new: true}, function(err, doc){});
+    })
 
   });
 
 })
-
-//
-// // //
-// // // // // 2) Check for obsolete LEAs: if an object exists in the database but not in the new data, the contract is down
-// // // //
