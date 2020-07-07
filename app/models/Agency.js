@@ -16,7 +16,7 @@ let agencySchema = new Schema({
     }
   },
   activeDate: Date, // When the contract was activated
-  active: Boolean, // Is the contract currently active
+  deactivateDate: Date, // Roughly when the contract was deactived, null if not
   videoRequests: Number // Number of times LEA has used Neighbors App to request video this quarter
 });
 
