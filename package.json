@@ -9,6 +9,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.22",
     "request": "^2.88.2",
     "xml-js": "^1.6.11"
   }
