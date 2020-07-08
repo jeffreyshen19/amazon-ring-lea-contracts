@@ -20,11 +20,12 @@ mongoose.connect(DB_URL, function(err, res) {
 
 // // ** COLLECT DATA **
 
-let oldLEA = new Set(),
+let oldLEA = {},
     newLEA = new Set();
 
 let update = [],
-    insert = [];
+    insert = [],
+    obsolete = [];
 
 // 1) Grab all LEA from the Ring website, and existing LEAs from database
 
@@ -40,9 +41,14 @@ function getData(){
 Promise.all([getData(), Agency.find({})]).then((values) => {
   let newData = values[0], oldData = values[1];
 
-  oldData.forEach((agency) => {oldLEA.add(agency.name);});
+  newData = newData.slice(0, 3);
 
-  // 3) Iterate through new data
+  oldData.forEach((agency) => {oldLEA[agency.name + " " + agency.address] = agency.videoRequests}); // Store names of LEAs in dict so they can be accessed in const time
+
+  console.log("Got " + newData.length + " documents from Ring");
+  console.log(oldLEA);
+
+  // 2) Iterate through new data, determine which to update and insert
   newData.forEach(function(agency, i){
     let name = agency.name[Object.keys(agency.name)[0]],
         address = agency.address[Object.keys(agency.address)[0]],
@@ -50,16 +56,10 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
         activeDate = new Date(agency.ExtendedData.Data[1].value._text),
         videoRequests = parseInt(agency.ExtendedData.Data[2].value._text); //TODO: deal with quarter
 
-    newLEA.add(name);
+    newLEA.add(name + " " + address);
 
-    // If this agency already exists in dataset
-    if(oldLEA.has(name)) update.push({
-      name: name,
-      videoRequests: videoRequests,
-    });
-
-    // Otherwise, create new object
-    else insert.push({
+    // If this agency does not exist in dataset, add it
+    if(!((name + " " + address) in oldLEA)) insert.push({
       name: name,
       address: address,
       state: state,
@@ -68,80 +68,58 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
       deactivateDate: null,
       videoRequests: videoRequests
     });
+
+    // Otherwise, update it if it needs to be updated
+    else if(oldLEA[name + " " + address] != videoRequests) update.push({
+      name: name,
+      address: address,
+      videoRequests: videoRequests,
+    });
   });
+
+  // 3) Iterate through old data, determine if there are any obsolete docs
+  oldData.forEach(function(agency){ 
+    if(!newLEA.has(agency.name + " " + agency.address)) obsolete.push({ // If an existing LEA is not in the new data, it is assumed to have ended its contract
+      name: agency.name,
+      address: agency.address,
+      deactivateDate: new Date()
+    });
+  })
 
   console.log("Inserting " + insert.length + " documents");
   console.log("Updating " + update.length + " documents");
+  console.log("Deactivating " + obsolete.length + " documents");
 
   // 4) Geocode all new data TODO: make this faster
-  function getCoords(data, i, callback){
-    if(!data.length) callback();
-    else request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
-        let coords = JSON.parse(body).results[0].geometry.location;
+  // function getCoords(data, i, callback){
+  //   if(!data.length) callback();
+  //   else request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
+  //       let coords = JSON.parse(body).results[0].geometry.location;
+  //
+  //       data[i].geolocation = {type: 'Point', coordinates: [coords.lat, coords.lng]}
+  //
+  //       if(i < data.length - 1) getCoords(data, i + 1, callback);
+  //       else callback();
+  //     });
+  // }
 
-        data[i].geolocation = {type: 'Point', coordinates: [coords.lat, coords.lng]}
+  // 5) Perform database updates
+  let promises = [];
 
-        if(i < data.length - 1) getCoords(data, i + 1, callback);
-        else callback();
-      });
-  }
+  console.log(update);
 
-  function bulkUpdate(data, i, callback){
-    if(!data.length) callback();
-    else Agency.findOneAndUpdate({name: data[i].name}, {videoRequests: data[i].videoRequests, deactivateDate: null}, {new: true}, function(err, doc){
-      if(i < data.length - 1) bulkUpdate(data, i + 1, callback);
-      else callback();
-    });
-  }
-
-  /*getCoords(insert, 0, function(){
-    console.log("Finished geocoding");
-
-    // 5) Add to database
-    bulkUpdate(update, 0, function(){
-      console.log("Updated all documents");
-      // 6) Check for LEA which have been deleted
-      obsoleteLEA = oldData.filter(function(d){
-        return !newLEA.has(d.name);
-      }).map(function(d){
-        d.deactivateDate = new Date();
-        return d;
-      });
-      bulkUpdate(obsoleteLEA, 0, function(){
-        console.log("Updated all obsolete documents");
-
-        if(insert.length) Agency.insertMany(insert, function(err, docs){
-          console.log("Inserted all documents");
-          // Close, we're done
-          mongoose.connection.close();
-        });
-        else mongoose.connection.close();
-      });
-    });
-  })*/
-
-  console.log(insert);
-
-  if(insert.length) Agency.insertMany(insert, function(err, docs){ // Insert any new LEAs
-    console.log("Inserted all documents");
-    console.log(docs);
-    // Close, we're done
-    // mongoose.connection.close();
+  if(insert.length) promises.push(Agency.insertMany(insert));
+  if(update.length) update.forEach(function(d){
+    promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {videoRequests: d.videoRequests}));
+  });
+  if(obsolete.length) obsolete.forEach(function(d){
+    promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {deactivateDate: d.deactivateDate}));
   });
 
-  /*Agency.updateMany({deactivateDate: null}, {deactivateDate: new Date()}, function(err, result) { // All agencies which are not present in the current dataset are assumed to have been removed
-    if (err) throw err;
-    else bulkUpdate(update, 0, function(){ // Update existing LEAs
-      console.log("Updated all obsolete documents");
-
-      if(insert.length) Agency.insertMany(insert, function(err, docs){ // Insert any new LEAs
-        console.log("Inserted all documents");
-        // Close, we're done
-        mongoose.connection.close();
-      });
-      else mongoose.connection.close();
-    });
+  if(promises.length) Promise.all(promises).then((values) => {
+    console.log("Saved to the Database");
+    mongoose.connection.close();
   });
-*/
+  else mongoose.connection.close();
 
 });
