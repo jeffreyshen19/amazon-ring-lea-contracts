@@ -1,20 +1,21 @@
 @font-face {
   font-family: "IBM Plex Sans";
-  src: url("/assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf"); }
+  src: url("/assets/fonts/IBM_Plex_Sans/IBMPlexSans-Regular.ttf");
+}
 
 @font-face {
   font-family: "IBM Plex Sans";
   src: url("/assets/fonts/IBM_Plex_Sans/IBMPlexSans-Bold.ttf");
-  font-weight: bold; }
+  font-weight: bold;
+}
 
-p {
-  font-family: "IBM Plex Sans"; }
+p{
+  font-family: "IBM Plex Sans";
+}
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6{
   font-family: "Georgia";
   font-weight: bold;
   line-height: 2.25rem;
-  margin-bottom: 1rem; }
-
-#wrapper {
-  padding: 4em 2em 3em; }
+  margin-bottom: 1rem;
+}
