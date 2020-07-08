@@ -12,8 +12,7 @@ let agencySchema = new Schema({
       required: true
     },
     coordinates: {
-      type: [Number],
-      required: true
+      type: [Number]
     }
   },
   activeDate: Date, // When the contract was activated

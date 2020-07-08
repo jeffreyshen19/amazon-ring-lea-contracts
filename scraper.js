@@ -8,7 +8,11 @@ require('dotenv').config();
 let mongoose = require("mongoose"),
     Agency = require("./app/models/Agency"),
     request = require('request'),
-    convert = require('xml-js');
+    convert = require('xml-js'),
+    geocoder = require('node-geocoder')({
+      provider: 'google',
+      apiKey: process.env.GOOGLE_API_KEY
+    });
 
 const DB_URL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/ring-lea';
 
@@ -18,7 +22,7 @@ mongoose.connect(DB_URL, function(err, res) {
   else console.log("SUCCESSfully connected to database");
 });
 
-// // ** COLLECT DATA **
+// ** COLLECT DATA **
 
 let oldLEA = {},
     newLEA = new Set();
@@ -41,12 +45,9 @@ function getData(){
 Promise.all([getData(), Agency.find({})]).then((values) => {
   let newData = values[0], oldData = values[1];
 
-  newData = newData.slice(0, 3);
-
   oldData.forEach((agency) => {oldLEA[agency.name + " " + agency.address] = agency.videoRequests}); // Store names of LEAs in dict so they can be accessed in const time
 
   console.log("Got " + newData.length + " documents from Ring");
-  console.log(oldLEA);
 
   // 2) Iterate through new data, determine which to update and insert
   newData.forEach(function(agency, i){
@@ -64,7 +65,7 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
       address: address,
       state: state,
       activeDate: activeDate,
-      geolocation: {type: 'Point', coordinates: [0, 0]},
+      geolocation: {type: 'Point', coordinates: null},
       deactivateDate: null,
       videoRequests: videoRequests
     });
@@ -78,7 +79,7 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
   });
 
   // 3) Iterate through old data, determine if there are any obsolete docs
-  oldData.forEach(function(agency){ 
+  oldData.forEach(function(agency){
     if(!newLEA.has(agency.name + " " + agency.address)) obsolete.push({ // If an existing LEA is not in the new data, it is assumed to have ended its contract
       name: agency.name,
       address: agency.address,
@@ -86,40 +87,51 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
     });
   })
 
-  console.log("Inserting " + insert.length + " documents");
-  console.log("Updating " + update.length + " documents");
-  console.log("Deactivating " + obsolete.length + " documents");
-
   // 4) Geocode all new data TODO: make this faster
-  // function getCoords(data, i, callback){
-  //   if(!data.length) callback();
-  //   else request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
-  //       let coords = JSON.parse(body).results[0].geometry.location;
-  //
-  //       data[i].geolocation = {type: 'Point', coordinates: [coords.lat, coords.lng]}
-  //
-  //       if(i < data.length - 1) getCoords(data, i + 1, callback);
-  //       else callback();
-  //     });
-  // }
+  console.log("Geocoding " + insert.length + " documents");
+  let addresses = insert.map((d) => d.address + ", USA"),
+      batches = [];
+  const CHUNK_SIZE = 50; // Break addresses into chunks to avoid Google Rate Limit
+
+  function batchGeocode(i) {
+    if(i >= addresses.length) {
+      console.log("Done Geocoding");
+      databaseUpdates();
+    }
+    else geocoder.batchGeocode(addresses.slice(i, i + CHUNK_SIZE)).then(function(data){
+      data.forEach(function(d, j){
+        if(d.error == null && d.value.length) insert[i + j].geolocation = {type: 'Point', coordinates: [d.value[0].latitude, d.value[0].longitude]}
+      });
+
+      setTimeout(function(){
+        batchGeocode(i + CHUNK_SIZE);
+      }, 1000);
+    })
+  }
+
+  batchGeocode(0);
 
   // 5) Perform database updates
-  let promises = [];
+  function databaseUpdates(){
+    console.log("Inserting " + insert.length + " documents");
+    console.log("Updating " + update.length + " documents");
+    console.log("Deactivating " + obsolete.length + " documents");
 
-  console.log(update);
+    let promises = [];
 
-  if(insert.length) promises.push(Agency.insertMany(insert));
-  if(update.length) update.forEach(function(d){
-    promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {videoRequests: d.videoRequests}));
-  });
-  if(obsolete.length) obsolete.forEach(function(d){
-    promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {deactivateDate: d.deactivateDate}));
-  });
+    if(insert.length) promises.push(Agency.insertMany(insert));
+    if(update.length) update.forEach(function(d){
+      promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {videoRequests: d.videoRequests}));
+    });
+    if(obsolete.length) obsolete.forEach(function(d){
+      promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {deactivateDate: d.deactivateDate}));
+    });
 
-  if(promises.length) Promise.all(promises).then((values) => {
-    console.log("Saved to the Database");
-    mongoose.connection.close();
-  });
-  else mongoose.connection.close();
+    if(promises.length) Promise.all(promises).then((values) => {
+      console.log("Saved to the Database");
+      mongoose.connection.close();
+    });
+    else mongoose.connection.close();
+  }
 
 });
