@@ -29,8 +29,8 @@ function getData(callback){
   });
 }
 
-
 getData(function(newData){
+  console.log("Grabbed " + newData.length + " documents");
 
   // 2) Grab all existing LEA from database
   let oldLEA = new Set(),
@@ -43,9 +43,9 @@ getData(function(newData){
     oldData.forEach((agency) => {oldLEA.add(agency.name);});
 
     // 3) Iterate through new data
-    newData.slice(1, 3).forEach(function(agency, i){
-      let name = agency.name._text,
-          address = agency.address._text,
+    newData.forEach(function(agency, i){
+      let name = agency.name[Object.keys(agency.name)[0]],
+          address = agency.address[Object.keys(agency.address)[0]],
           state = address.split(", ")[1],
           activeDate = new Date(agency.ExtendedData.Data[1].value._text),
           videoRequests = parseInt(agency.ExtendedData.Data[2].value._text); //TODO: deal with quarter
@@ -56,6 +56,7 @@ getData(function(newData){
       if(oldLEA.has(name)) update.push({
         name: name,
         videoRequests: videoRequests,
+        deactivateDate: null
       });
 
       // Otherwise, create new object
@@ -69,7 +70,10 @@ getData(function(newData){
       });
     });
 
-    // 4) Geocode all new data
+    console.log("Inserting " + insert.length + " documents");
+    console.log("Updating " + update.length + " documents");
+
+    // 4) Geocode all new data TODO: make this faster
     function getCoords(data, i, callback){
       if(!data.length) callback();
       else request("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(data[i].address + ", USA") + "&key=" + process.env.GOOGLE_API_KEY, function (error, response, body) {
@@ -82,21 +86,38 @@ getData(function(newData){
         });
     }
 
+    function bulkUpdate(data, i, callback){
+      if(!data.length) callback();
+      else Agency.findOneAndUpdate({name: data[i].name}, {videoRequests: data[i].videoRequests, deactivateDate: data[i].deactivateDate}, {new: true}, function(err, doc){
+        if(i < data.length - 1) bulkUpdate(data, i + 1, callback);
+        else callback();
+      });
+    }
+
     getCoords(insert, 0, function(){
+      console.log("Finished geocoding");
+
       // 5) Add to database
-      function bulkUpdate(data, i){
-        Agency.findOneAndUpdate({name: data[i].name}, {videoRequests: data[i].videoRequests, deactivateDate: null}, {new: true}, function(err, doc){
-          if(i < data.length - 1) bulkUpdate(data, i + 1);
+      bulkUpdate(update, 0, function(){
+        console.log("Updated all documents");
+        // 6) Check for LEA which have been deleted
+        obsoleteLEA = oldData.filter(function(d){
+          return !newLEA.has(d.name);
+        }).map(function(d){
+          d.deactivateDate = new Date();
+          return d;
         });
-      }
+        bulkUpdate(obsoleteLEA, 0, function(){
+          console.log("Updated all obsolete documents");
 
-      if(insert.length) Agency.insertMany(insert);
-      if(update.length) bulkUpdate(update, 0);
-    })
-
-    // 6) Check for LEA which have been deleted
-    oldData.forEach(function(d){
-      if(!newLEA.has(d.name)) Agency.findOneAndUpdate({name: d.name}, {deactivateDate: new Date()}, {new: true}, function(err, doc){});
+          if(insert.length) Agency.insertMany(insert, function(err, docs){
+            console.log("Inserted all documents");
+            // Close, we're done
+            mongoose.connection.close();
+          });
+          else mongoose.connection.close();
+        });
+      });
     })
 
   });
