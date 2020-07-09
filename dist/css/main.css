@@ -20,14 +20,28 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 2.25rem;
   margin-bottom: 1rem; }
 
+#time-series .line {
+  fill: none;
+  stroke: #1f3a93;
+  stroke-width: 3; }
+
 #wrapper {
   padding: 4em 2em 3em; }
 
 header {
-  margin-bottom: 2em; }
+  margin-bottom: 3em; }
 
-#about .column:nth-child(2) {
-  color: #8b8b8b;
-  font-size: 0.9em; }
-  #about .column:nth-child(2) li {
-    margin-bottom: 1rem; }
+#about {
+  margin-bottom: 3em; }
+  #about .column:nth-child(2) {
+    color: #8b8b8b;
+    font-size: 0.9em; }
+    #about .column:nth-child(2) li {
+      margin-bottom: 1rem; }
+
+#statistics .column:first-child {
+  background: #1f3a93;
+  color: white; }
+
+#statistics .column {
+  background: #dcdcdc; }

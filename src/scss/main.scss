@@ -1,11 +1,12 @@
 @import "theme";
+@import "graphs";
 
 #wrapper{
   padding: 4em 2em 3em;
 }
 
 header{
-  margin-bottom: 2em;
+  margin-bottom: 3em;
 }
 
 #about{
@@ -15,5 +16,16 @@ header{
     li{
       margin-bottom: 1rem;
     }
+  }
+  margin-bottom: 3em;
+}
+
+#statistics{
+  .column:first-child{
+    background: $blue;
+    color: white;
+  }
+  .column{
+    background: #dcdcdc;
   }
 }
