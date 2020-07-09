@@ -7,6 +7,7 @@ require('dotenv').config();
 
 let mongoose = require("mongoose"),
     Agency = require("./app/models/Agency"),
+    Snapshot = require("./app/models/Snapshot"),
     request = require('request'),
     convert = require('xml-js'),
     geocoder = require('node-geocoder')({
@@ -30,6 +31,9 @@ let oldLEA = {},
 let update = [],
     insert = [],
     obsolete = [];
+
+let totalRequests = 0,
+    totalAgencies = 0;
 
 // 1) Grab all LEA from the Ring website, and existing LEAs from database
 
@@ -56,6 +60,9 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
         state = address.split(", ")[1],
         activeDate = new Date(agency.ExtendedData.Data[1].value._text),
         videoRequests = parseInt(agency.ExtendedData.Data[2].value._text); //TODO: deal with quarter
+
+    totalRequests += videoRequests;
+    totalAgencies += 1;
 
     newLEA.add(name + " " + address);
 
@@ -127,11 +134,29 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
       promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {deactivateDate: d.deactivateDate}));
     });
 
-    if(promises.length) Promise.all(promises).then((values) => {
-      console.log("Saved to the Database");
-      mongoose.connection.close();
+    // Create snapshot
+
+    let snapshot = new Snapshot({
+      date: new Date(),
+      videoRequests: totalRequests,
+      agencies: totalAgencies,
+      insert: insert.map(function(d){return {name: d.name, address: d.address}}),
+      update: update.map(function(d){return {name: d.name, address: d.address, videoRequests: d.videoRequests, prevVideoRequests: oldLEA[d.name + " " + d.address]}}),
+      obsolete: obsolete.map(function(d){return {name: d.name, address: d.address}}),
     });
-    else mongoose.connection.close();
+
+    snapshot.save(function(err, doc) {
+      if(err){
+        mongoose.connection.close();
+        throw err;
+      }
+
+      if(promises.length) Promise.all(promises).then((values) => {
+        console.log("Saved to the Database");
+        mongoose.connection.close();
+      });
+      else mongoose.connection.close();
+    });
   }
 
 });
