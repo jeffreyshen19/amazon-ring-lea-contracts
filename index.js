@@ -6,9 +6,11 @@
 let express = require("express"),
     mongoose = require("mongoose"),
     Agency = require("./app/models/Agency"),
-    Snapshot = require("./app/models/Snapshot");
+    Snapshot = require("./app/models/Snapshot"),
+    cors = require('cors');
 
 let app = express();
+app.use(cors());
 
 const PORT = process.env.PORT || 3000,
       DB_URL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/ring-lea';
