@@ -30,6 +30,23 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 12px;
   font-family: "IBM Plex Sans"; }
 
+#time-series rect.overlay {
+  fill: none;
+  pointer-events: all;
+  cursor: pointer; }
+
+#time-series circle {
+  fill: #1f3a93; }
+
+#time-series .tooltip div {
+  padding: 10px;
+  font-size: 14px; }
+  #time-series .tooltip div p {
+    line-height: 0.85rem; }
+
+#time-series circle, #time-series .tooltip {
+  transition: 0.05s all; }
+
 #wrapper {
   padding: 4em 2em 3em; }
 

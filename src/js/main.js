@@ -3,8 +3,6 @@ function drawTimeSeries(data, xExtent, yExtent){
     height = 250 - margin.top - margin.bottom,
     width = document.getElementById("time-series").offsetWidth - margin.left - margin.right;
 
-  console.log(width);
-
   let svg = d3.select('#time-series').select("svg")
     .attr("width",  width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -38,6 +36,46 @@ function drawTimeSeries(data, xExtent, yExtent){
     .attr("y", 0 - margin.left)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em");
+
+  // Add mouseover
+  let bisectDate = d3.bisector(function(d) { return d.date; }).left,
+      circle = d3.select("circle"),
+      tooltip = d3.select(".tooltip"),
+      timeFormat = d3.timeFormat("%B %Y");
+
+  svg.select("rect") // Overlay for smooth hover
+    .attr("width", width)
+    .attr("height", height)
+    .on("mouseover", function(){
+      circle.attr("visibility", "visible");
+      tooltip.attr("visibility", "visible");
+    })
+    .on("mouseout", function(){
+      circle.attr("visibility", "hidden");
+      tooltip.attr("visibility", "hidden");
+    })
+    .on("mousemove", function(){
+      let x0 = x.invert(d3.mouse(this)[0]),
+          i = bisectDate(data, x0, 1),
+          d0 = data[i - 1],
+          d1 = data[i],
+          d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+      // Move circle
+      circle.attr("cx", x(d.date)).attr("cy", y(d.y));
+
+      // Tooltip
+      tooltip
+        .attr("x", x(d.date) + 160 > width ? x(d.date) - 170 : x(d.date) + 10)
+        .attr("y", y(d.y) - 25)
+        .select(".box")
+        .html(`
+          <p class = "heading">${timeFormat(d.date)}</p>
+          <p>New Agencies: ${d.y}</p>
+        `);
+
+      console.log(d);
+    });
 }
 
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this

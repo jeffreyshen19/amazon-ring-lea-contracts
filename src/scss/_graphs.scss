@@ -10,4 +10,29 @@
     font-size: 12px;
     font-family: "IBM Plex Sans";
   }
+
+  rect.overlay{
+    fill: none;
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  circle{
+    fill: $blue;
+  }
+
+  .tooltip{
+    // background:#fff;
+    div{
+      padding: 10px;
+      font-size: 14px;
+      p{
+        line-height: 0.85rem;
+      }
+    }
+  }
+
+  circle, .tooltip{
+    transition: 0.05s all;
+  }
 }
