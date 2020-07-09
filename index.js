@@ -5,7 +5,8 @@
 
 let express = require("express"),
     mongoose = require("mongoose"),
-    Agency = require("./app/models/Agency");
+    Agency = require("./app/models/Agency"),
+    Snapshot = require("./app/models/Snapshot");
 
 let app = express();
 
@@ -19,8 +20,14 @@ mongoose.connect(DB_URL, function(err, res) {
 });
 
 app.get("/", function(req, res){
-  Agency.find({}, function(err, agencies){
-    res.json(agencies);
+  Promise.all([
+    Snapshot.findOne().sort({created_at: -1}), //Most recent snapshot
+    Agency.find({}) // All agency data
+  ]).then(function(values){
+    res.json({
+      snapshot: values[0],
+      agencies: values[1]
+    });
   });
 });
 
