@@ -4,4 +4,10 @@
     stroke: $blue;
     stroke-width: 3;
   }
+
+  .yAxisLabel{
+    text-anchor: middle;
+    font-size: 12px;
+    font-family: "IBM Plex Sans";
+  }
 }

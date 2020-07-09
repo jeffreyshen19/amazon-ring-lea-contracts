@@ -59,9 +59,14 @@ html
                   div 
                     p 20
                     p.heading New Agencies Added This Month
-          .column 
+          .column#time-series 
             p.heading Law Enforcement Agencies Added Each Month
-            svg#time-series
+            svg
+              g
+                path.line
+                g.xAxis 
+                g.yAxis 
+                text.yAxisLabel Monthly Agency Contracts
           .column 
           
     //- https://act.eff.org/action/tell-amazon-ring-to-end-its-dangerous-police-partnerships      

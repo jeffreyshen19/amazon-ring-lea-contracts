@@ -25,6 +25,11 @@ h1, h2, h3, h4, h5, h6 {
   stroke: #1f3a93;
   stroke-width: 3; }
 
+#time-series .yAxisLabel {
+  text-anchor: middle;
+  font-size: 12px;
+  font-family: "IBM Plex Sans"; }
+
 #wrapper {
   padding: 4em 2em 3em; }
 
