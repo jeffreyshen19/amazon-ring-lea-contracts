@@ -7,8 +7,12 @@
   src: url("/assets/fonts/IBM_Plex_Sans/IBMPlexSans-Bold.ttf");
   font-weight: bold; }
 
-p {
+p, li {
   font-family: "IBM Plex Sans"; }
+
+ul {
+  list-style-type: disc;
+  padding-left: 30px; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: "Georgia";
@@ -18,3 +22,12 @@ h1, h2, h3, h4, h5, h6 {
 
 #wrapper {
   padding: 4em 2em 3em; }
+
+header {
+  margin-bottom: 2em; }
+
+#about .column:nth-child(2) {
+  color: #8b8b8b;
+  font-size: 0.9em; }
+  #about .column:nth-child(2) li {
+    margin-bottom: 1rem; }

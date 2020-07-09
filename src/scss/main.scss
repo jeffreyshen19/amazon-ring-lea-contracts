@@ -5,4 +5,15 @@
 }
 
 header{
+  margin-bottom: 2em;
+}
+
+#about{
+  .column:nth-child(2){
+    color: #8b8b8b;
+    font-size: 0.9em;
+    li{
+      margin-bottom: 1rem;
+    }
+  }
 }
