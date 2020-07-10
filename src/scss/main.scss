@@ -21,11 +21,15 @@ header{
 }
 
 #statistics{
-  .column:first-child{
+  & > .column:first-child{
     background: $blue;
     color: white;
   }
-  .column{
+  & > .column{
     background: #dcdcdc;
+
+    & > .heading{
+      margin-bottom: 1rem;
+    }
   }
 }

@@ -61,9 +61,11 @@ header {
     #about .column:nth-child(2) li {
       margin-bottom: 1rem; }
 
-#statistics .column:first-child {
+#statistics > .column:first-child {
   background: #1f3a93;
   color: white; }
 
-#statistics .column {
+#statistics > .column {
   background: #dcdcdc; }
+  #statistics > .column > .heading {
+    margin-bottom: 1rem; }

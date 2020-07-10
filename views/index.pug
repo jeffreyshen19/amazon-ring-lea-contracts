@@ -20,7 +20,7 @@ html
         header.has-text-centered 
           //- TODO; fix text 
           h1.is-size-3 Amazon Ring's Police Partnership Tracker
-          p.heading.is-size-6 Jeffrey Shen • <span>Updated [July 26, 2020]</span>
+          p.heading.is-size-6 Last Updated <span id = "last-updated"></span> Hours Ago
           
         #about.columns
           .column 
@@ -35,33 +35,25 @@ html
               li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
               li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
               
-        #statistics.columns  
-          .column.is-narrow 
+        #statistics.columns
+          .column.is-3 
             p.heading Current Statistics 
-            .level 
-              .level-left
-                .level-item 
-                  div 
-                    p 1,300
-                    p.heading Law Enforcement Agencies 
-                .level-item 
-                  div 
-                    p 4,000
-                    p.heading Video Requests 
-            .level 
-              .level-left
-                .level-item 
-                  div 
-                    p 40
-                    p.heading States
-              .level-left
-                .level-item 
-                  div 
-                    p 20
-                    p.heading New Agencies Added This Month
+            .columns.is-multiline.is-variable.is-6 
+              .column 
+                p.statistic.is-size-4#statistic-lea 0
+                p.heading Law Enforcement Agencies 
+              .column
+                p.statistic.is-size-4#statistic-video-requests 0
+                p.heading Video Requests Made By Law Enforcement
+              .column
+                p.statistic.is-size-4#statistic-states 0
+                p.heading States With Police-Amazon Contracts
+              .column
+                p.statistic.is-size-4#statistic-this-month 0
+                p.heading New Agencies Added This Month
           .column#time-series 
             p.heading Law Enforcement Agencies Added Each Month
-            svg(overflow="visible")
+            svg(overflow="visible" style = "display:none")
               g
                 path.line
                 g.xAxis 

@@ -6,6 +6,7 @@ function drawTimeSeries(data, xExtent, yExtent){
   let svg = d3.select('#time-series').select("svg")
     .attr("width",  width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .style("display", "block")
     .select("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -73,15 +74,22 @@ function drawTimeSeries(data, xExtent, yExtent){
           <p class = "heading">${timeFormat(d.date)}</p>
           <p>New Agencies: ${d.y}</p>
         `);
-
-      console.log(d);
     });
+}
+
+function getSummaryStatistics(data, states, agenciesAddedThisMonth){
+  $("#last-updated").text(Math.round((new Date() - (new Date(data.snapshot.date))) / 3600000));
+  $("#statistic-lea").text(d3.format(",")(data.snapshot.agencies));
+  $("#statistic-video-requests").text(d3.format(",")(data.snapshot.videoRequests));
+  $("#statistic-states").text(Object.keys(states).length);
+  $("#statistic-this-month").text(agenciesAddedThisMonth);
 }
 
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   console.log(data);
   let newAgencyLine = {},
-      deactivatedAgencyLine = []; //TODO: add this later
+      deactivatedAgencyLine = [], //TODO: add this later
+      states = {};
 
   // Preprocess Data
   data.agencies.forEach(function(agency){
@@ -91,7 +99,14 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
     // Group activity by month
     if(!(monthYear in newAgencyLine)) newAgencyLine[monthYear] = 0;
     newAgencyLine[monthYear] += 1;
+
+    // Get total states
+    states[agency.address.split(", ")[1]] = true;
   });
+
+  let today = new Date(),
+    todayMonthYear = new Date(today.getFullYear(), today.getMonth()),
+    agenciesAddedThisMonth = (todayMonthYear in newAgencyLine) ? newAgencyLine[todayMonthYear] : 0;
 
   newAgencyLine = Object.keys(newAgencyLine)
     .map(function(d){return {date: new Date(d), y:  newAgencyLine[d]}})
@@ -102,6 +117,7 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
 
   // Draw Graphs
   drawTimeSeries(newAgencyLine, xExtent, yExtent);
+  getSummaryStatistics(data, states, agenciesAddedThisMonth);
 
   // Add resize handlers
   let resizeEnd;
