@@ -23,9 +23,10 @@ mongoose.connect(DB_URL, function(err, res) {
 
 app.get("/", function(req, res){
   Promise.all([
-    Snapshot.findOne().sort({created_at: -1}), //Most recent snapshot
+    Snapshot.findOne({}).sort({date: -1}), //Most recent snapshot
     Agency.find({}) // All agency data
   ]).then(function(values){
+    console.log(values[0]);
     res.json({
       snapshot: values[0],
       agencies: values[1]
