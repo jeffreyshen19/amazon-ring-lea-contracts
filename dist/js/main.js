@@ -99,12 +99,20 @@ function getUpdates(updates){
       });
 }
 
-function drawMap(){
-  let stateList = ["AK", "HI", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY", "DC"];
+function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
+  let colorScale = d3.scaleLinear().domain([0, showAgencies ? maxAgencies : maxVideoRequests]).range(["#dedede", "#1f3a93"]);
+
+  d3.select("#map").select("svg").selectAll(".path")
+    .data(data)
+    .style("fill", (d) => colorScale(showAgencies ? d.agencies : d.videoRequests))
+    .on("mouseover", function(d){
+      console.log(d);
+    });
+
+  console.log(data, maxAgencies, maxVideoRequests);
 }
 
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
-  console.log(data);
   let newAgencyLine = {},
       deactivatedAgencyLine = [], //TODO: add this later
       states = {},
@@ -121,7 +129,9 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
 
     // Get total states
     let state = agency.address.split(", ")[1];
-    states[state] = true;
+    if(!(state in states)) states[state] = {agencies: 0, videoRequests: 0};
+    states[state].agencies += 1;
+    states[state].videoRequests += agency.videoRequests;
 
     // Add recent updates
     if (agency.activeDate.getFullYear() >= 2020 && agency.deactivateDate == null) updates.push({
@@ -156,11 +166,30 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   let xExtent = d3.extent(newAgencyLine, function(d) { return d.date; }),
       yExtent = [0, d3.max(newAgencyLine, function(d) { return d.y; }) + 20];
 
+  // Process Map Data
+  let stateList = ["AK", "HI", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY", "DC"],
+      maxAgencies = 0,
+      maxVideoRequests = 0;
+
+  let mapData = stateList.map(function(state){
+    let agencies = state in states ? states[state].agencies : 0,
+        videoRequests = state in states ? states[state].videoRequests : 0;
+
+    maxAgencies = Math.max(maxAgencies, agencies);
+    maxVideoRequests = Math.max(maxVideoRequests, videoRequests);
+
+    return {
+      state: state,
+      agencies: agencies,
+      videoRequests: videoRequests,
+    }
+  });
+
   // Draw Graphs
   drawTimeSeries(newAgencyLine, xExtent, yExtent);
   getSummaryStatistics(data, states, agenciesAddedThisMonth);
   getUpdates(updates);
-  drawMap();
+  drawMap(mapData, maxAgencies, maxVideoRequests, true);
 
   // Add resize handlers
   let resizeEnd;

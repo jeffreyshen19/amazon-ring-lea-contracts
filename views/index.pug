@@ -74,8 +74,10 @@ html
           .column.is-3 
             p.heading Latest Updates 
             ul#updates 
-            
-        #map!= svg
+        
+        #map.columns
+          .column!= svg
+          .column.is-2
 
     //- https://act.eff.org/action/tell-amazon-ring-to-end-its-dangerous-police-partnerships      
     //- https://www.eff.org/deeplinks/2020/06/amazon-ring-must-end-its-dangerous-partnerships-police

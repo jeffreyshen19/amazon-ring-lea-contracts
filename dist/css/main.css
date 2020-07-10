@@ -47,6 +47,11 @@ h1, h2, h3, h4, h5, h6 {
 #time-series circle, #time-series .tooltip {
   transition: 0.05s all; }
 
+#map .path {
+  fill: #f4f4f4; }
+  #map .path, #map .path circle {
+    stroke: white; }
+
 #wrapper {
   padding: 4em 2em 3em; }
 
@@ -63,18 +68,18 @@ header {
     #about .methodology li {
       margin-bottom: 1rem; }
 
-#statistics > .column:first-child {
-  background: #1f3a93;
-  color: white; }
-
-#statistics > .column {
-  background: #f4f4f4; }
-  #statistics > .column > .heading {
-    margin-bottom: 1rem; }
-
-#statistics .column:nth-child(3) li {
-  font-size: 0.9rem;
-  line-height: 1.1rem; }
-  #statistics .column:nth-child(3) li .heading {
-    color: #1f3a93;
-    margin-top: 5px; }
+#statistics {
+  margin-bottom: 3em; }
+  #statistics > .column:first-child {
+    background: #1f3a93;
+    color: white; }
+  #statistics > .column {
+    background: #f4f4f4; }
+    #statistics > .column > .heading {
+      margin-bottom: 1rem; }
+  #statistics .column:nth-child(3) li {
+    font-size: 0.9rem;
+    line-height: 1.1rem; }
+    #statistics .column:nth-child(3) li .heading {
+      color: #1f3a93;
+      margin-top: 5px; }

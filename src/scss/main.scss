@@ -24,13 +24,15 @@ header{
 }
 
 #statistics{
+  margin-bottom: 3em;
+
   & > .column:first-child{
     background: $blue;
     color: white;
   }
 
   & > .column{
-    background: #f4f4f4;
+    background: $gray;
 
     & > .heading{
       margin-bottom: 1rem;

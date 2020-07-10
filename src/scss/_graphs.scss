@@ -36,3 +36,13 @@
     transition: 0.05s all;
   }
 }
+
+#map{
+  .path{
+    fill: $gray;
+
+    &, circle{
+      stroke: white;
+    }
+  }
+}
