@@ -48,9 +48,28 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 0.85rem; }
 
 #map .path {
-  fill: #f4f4f4; }
+  fill: #f4f4f4;
+  transition: 0.2s all; }
   #map .path, #map .path circle {
     stroke: white; }
+
+#map input[type="radio"] {
+  margin-right: 6px;
+  vertical-align: middle; }
+
+#map #scale {
+  height: 20px;
+  background: linear-gradient(to right, #f4f4f4, #1f3a93);
+  position: relative; }
+  #map #scale .text {
+    position: absolute;
+    width: 100%;
+    top: 25px;
+    font-size: 12px; }
+    #map #scale .text .left {
+      float: left; }
+    #map #scale .text .right {
+      float: right; }
 
 #wrapper {
   padding: 4em 2em 3em; }

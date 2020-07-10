@@ -40,9 +40,36 @@
 #map{
   .path{
     fill: $gray;
+    transition: 0.2s all;
 
     &, circle{
       stroke: white;
     }
   }
+
+  input[type = "radio"]{
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  #scale{
+    height: 20px;
+    background: linear-gradient(to right, $gray, $blue);
+    position: relative;
+
+    .text{
+      position: absolute;
+      width: 100%;
+      top: 25px;
+      font-size: 12px;
+
+      .left{
+        float: left;
+      }
+      .right{
+        float: right;
+      }
+    }
+  }
+
 }

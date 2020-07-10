@@ -104,7 +104,7 @@ function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
       svg = d3.select("#map").select("svg"),
       tooltip = svg.select(".tooltip");
 
-  const abbrevToName = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"District Of Columbia","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"};
+  const abbrevToName = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"Washington DC","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"};
 
   svg.selectAll(".path")
     .data(data)
@@ -129,7 +129,8 @@ function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
         `);
     });
 
-  console.log(data, maxAgencies, maxVideoRequests);
+  d3.select("#scale").select(".right").select("p")
+    .text(`${d3.format(",")(showAgencies ? maxAgencies : maxVideoRequests)} ${showAgencies ? "Agencies" : "Video Requests"}`);
 }
 
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
@@ -219,4 +220,9 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
       drawTimeSeries(newAgencyLine, xExtent, yExtent);
     }, 100);
   });
+
+  // Add button handlers
+  $("#mapRadioAgencies").click(function(){drawMap(mapData, maxAgencies, maxVideoRequests, true)});
+  $("#mapRadioVideoRequests").click(function(){drawMap(mapData, maxAgencies, maxVideoRequests, false)});
+
 });

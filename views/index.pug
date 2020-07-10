@@ -76,8 +76,23 @@ html
             ul#updates 
         
         #map.columns
-          .column!= svg
           .column.is-2
+            p.heading Show:
+            input(type = "radio" id = "mapRadioAgencies" name = "mapRadioShow" value = "true" checked)
+            label(for = "mapRadioAgencies") Agencies
+            br
+            input(type = "radio" id = "mapRadioVideoRequests" name = "mapRadioShow" value = "false")
+            label(for = "mapRadioVideoRequests") Video Requests
+            br 
+            br 
+            p.heading Scale: 
+            #scale
+              .text 
+                .left
+                  p 0
+                .right
+                  p 
+          .column!= svg
 
     //- https://act.eff.org/action/tell-amazon-ring-to-end-its-dangerous-police-partnerships      
     //- https://www.eff.org/deeplinks/2020/06/amazon-ring-must-end-its-dangerous-partnerships-police
