@@ -99,6 +99,10 @@ function getUpdates(updates){
       });
 }
 
+function drawMap(){
+  let stateList = ["AK", "HI", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY", "DC"];
+}
+
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   console.log(data);
   let newAgencyLine = {},
@@ -156,6 +160,7 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   drawTimeSeries(newAgencyLine, xExtent, yExtent);
   getSummaryStatistics(data, states, agenciesAddedThisMonth);
   getUpdates(updates);
+  drawMap();
 
   // Add resize handlers
   let resizeEnd;

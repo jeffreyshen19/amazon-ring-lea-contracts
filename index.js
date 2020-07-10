@@ -26,7 +26,6 @@ app.get("/", function(req, res){
     Snapshot.findOne({}).sort({date: -1}), //Most recent snapshot
     Agency.find({}) // All agency data
   ]).then(function(values){
-    console.log(values[0]);
     res.json({
       snapshot: values[0],
       agencies: values[1]

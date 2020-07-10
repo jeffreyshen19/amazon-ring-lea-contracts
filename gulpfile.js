@@ -2,7 +2,8 @@ let gulp = require('gulp'),
     sass = require('gulp-sass'),
     minify = require('gulp-minify'),
     pug = require('gulp-pug'),
-    webserver = require('gulp-webserver');
+    webserver = require('gulp-webserver'),
+    fs = require('fs');
 
 sass.compiler = require('node-sass');
 
@@ -19,8 +20,13 @@ gulp.task('js', function() {
 });
 
 gulp.task('views', function buildHTML() {
+  let svg = fs.readFileSync("./assets/graphics/usMap.svg");
   return gulp.src('./views/*.pug')
-    .pipe(pug())
+    .pipe(pug({
+      data: {
+        svg: svg
+      }
+    }))
     .pipe(gulp.dest('.'));
 });
 
