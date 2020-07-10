@@ -35,7 +35,7 @@ html
               li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
               li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
               
-        #statistics.columns
+        #statistics.columns.is-variable.is-6
           .column.is-3 
             p.heading Current Statistics 
             .columns.is-multiline.is-variable.is-6 
@@ -51,7 +51,7 @@ html
               .column
                 p.statistic.is-size-4#statistic-this-month 0
                 p.heading New Agencies Added This Month
-          .column#time-series 
+          .column#time-series.is-6 
             p.heading Law Enforcement Agencies Added Each Month
             svg(overflow="visible" style = "display:none")
               g
@@ -63,8 +63,10 @@ html
                 foreignObject.tooltip(width="160" height="50" visibility="hidden")
                   .box
                 rect.overlay
-          .column 
-          
+          .column.is-3 
+            p.heading Latest Updates 
+            ul#updates 
+
     //- https://act.eff.org/action/tell-amazon-ring-to-end-its-dangerous-police-partnerships      
     //- https://www.eff.org/deeplinks/2020/06/amazon-ring-must-end-its-dangerous-partnerships-police
         

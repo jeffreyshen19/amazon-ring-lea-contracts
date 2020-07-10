@@ -25,11 +25,25 @@ header{
     background: $blue;
     color: white;
   }
+
   & > .column{
-    background: #dcdcdc;
+    background: #f4f4f4;
 
     & > .heading{
       margin-bottom: 1rem;
+    }
+  }
+
+  .column:nth-child(3){
+
+    li{
+      font-size: 0.9rem;
+      line-height: 1.1rem;
+
+      .heading{
+        color: $blue;
+        margin-top: 5px;
+      }
     }
   }
 }

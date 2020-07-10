@@ -1,5 +1,5 @@
 function drawTimeSeries(data, xExtent, yExtent){
-  let margin = {top: 10, right: 20, bottom: 25, left: 50},
+  let margin = {top: 10, right: 50, bottom: 25, left: 50},
     height = 250 - margin.top - margin.bottom,
     width = document.getElementById("time-series").offsetWidth - margin.left - margin.right;
 
@@ -85,11 +85,26 @@ function getSummaryStatistics(data, states, agenciesAddedThisMonth){
   $("#statistic-this-month").text(agenciesAddedThisMonth);
 }
 
+function getUpdates(updates){
+  let dateFormat = d3.timeFormat("%m/%d/%Y")
+  d3.select("#updates").selectAll("li")
+    .data(updates)
+    .enter()
+    .append("li")
+      .html(function(d){
+        return `
+          ${d.text}
+          <p class = "heading">${dateFormat(d.date)}</p>
+        `
+      });
+}
+
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   console.log(data);
   let newAgencyLine = {},
       deactivatedAgencyLine = [], //TODO: add this later
-      states = {};
+      states = {},
+      updates = [];
 
   // Preprocess Data
   data.agencies.forEach(function(agency){
@@ -101,8 +116,30 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
     newAgencyLine[monthYear] += 1;
 
     // Get total states
-    states[agency.address.split(", ")[1]] = true;
+    let state = agency.address.split(", ")[1];
+    states[state] = true;
+
+    // Add recent updates
+    if (agency.activeDate.getFullYear() >= 2020 && agency.deactivateDate == null) updates.push({
+      "date": agency.activeDate,
+      "text": `${agency.name} (${state}) added a contract with Ring`
+    });
   });
+
+  // Add more updates
+  data.snapshot.obsolete.forEach(function(agency){
+    updates.push({
+      "date": new Date(data.snapshot.date),
+      "text": `${agency.name} (${agency.address.split(", ")[1]}) removed their contract with Ring`
+    });
+  });
+  data.snapshot.update.forEach(function(agency){
+    if(agency.videoRequests > agency.prevVideoRequests) updates.push({
+      "date": new Date(data.snapshot.date),
+      "text": `${agency.name} (${agency.address.split(", ")[1]}) requested ${agency.videoRequests - agency.prevVideoRequests} video${agency.videoRequests - agency.prevVideoRequests == 1 ? "" : "s"}`
+    });
+  });
+  updates = updates.sort(function(a, b){return b.date - a.date}).slice(0, 4); // Get the four most recent updates
 
   let today = new Date(),
     todayMonthYear = new Date(today.getFullYear(), today.getMonth()),
@@ -118,6 +155,7 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   // Draw Graphs
   drawTimeSeries(newAgencyLine, xExtent, yExtent);
   getSummaryStatistics(data, states, agenciesAddedThisMonth);
+  getUpdates(updates);
 
   // Add resize handlers
   let resizeEnd;
