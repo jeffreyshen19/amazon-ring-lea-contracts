@@ -2,11 +2,11 @@ doctype html
 html 
   head
     meta(charset="UTF-8")
-    meta(name = "description" content = "ADD DESCRIPTION")
+    meta(name = "description" content = "A nearly real-time dashboard of the over 1,000 partnerships Amazon Ring has with local law enforcement.")
     meta(name = "author" content = "Jeffrey Shen")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
       
-    title ADD TITLE 
+    title Amazon Ring's Police Partnership Tracker
     
     link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css")
     link(rel="stylesheet" href="/dist/css/main.css")
@@ -18,22 +18,30 @@ html
     #wrapper.columns.is-centered 
       .column.is-8.is-12-mobile
         header.has-text-centered 
-          //- TODO; fix text 
           h1.is-size-3 Amazon Ring's Police Partnership Tracker
           p.heading.is-size-6 Last Updated <span id = "last-updated"></span> Hours Ago
           
-        #about.columns
-          .column 
-            p Aliquip pariatur voluptate mollit non mollit ut qui ea do aute aliqua ea. Aliquip sint commodo anim dolore ad officia et amet dolor non reprehenderit qui nisi elit aute fugiat aliqua. Excepteur do sunt fugiat et cillum duis fugiat deserunt ea incididunt. Esse labore est anim quis nisi enim mollit quis est dolor.
-              br
-              br
-              | Irure enim amet ipsum sit consectetur consequat aute consectetur. Ullamco sunt consequat et commodo aute eiusmod dolore ad irure voluptate amet nostrud. Reprehenderit et qui amet ex sunt in cillum reprehenderit dolore officia tempor sint. Exercitation in duis consequat dolor qui amet mollit sit ad. Nulla excepteur minim in esse dolore aliqua labore excepteur tempor do dolor dolore in excepteur officia voluptate.
-          .column 
-            ul 
-              li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
-              li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
-              li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
-              li Aliquip mollit minim ipsum velit amet quis eu voluptate nulla reprehenderit amet est irure anim voluptate consectetur.
+        #about
+          p Amazon Ring, maker of smart video doorbells, is currently partnered with over 1,400 police departments across the U.S., enabling local law enforcement to request video footage from users' Ring devices—often <a href = "https://www.vox.com/recode/2019/10/8/20903536/amazon-ring-doorbell-civil-rights-police-partnerships">without a warrant</a>. Once videos are accessed, police can <a href = "https://www.markey.senate.gov/news/press-releases/senator-markey-investigation-into-amazon-ring-doorbell-reveals-egregiously-lax-privacy-policies-and-civil-rights-protections">store this footage indefinitely</a>, use it to <a href = "https://www.vox.com/recode/2019/10/8/20903536/amazon-ring-doorbell-civil-rights-police-partnerships">target protestors</a>, or freely share this data to other agencies like ICE or the FBI. 
+            br 
+            br 
+            | These partnerships have been criticized by over <a href = "https://www.fightforthefuture.org/news/2019-10-07-open-letter-calling-on-elected-officials-to-stop/">30 civil rights groups</a>, as well as Senator Ed Markey of Massachusetts, who <a href = "https://www.washingtonpost.com/technology/2019/09/05/sen-markey-seeks-answers-ring-doorbell-camera-police-network/">said</a> these partnerships “could easily create a surveillance network that places dangerous burdens on people of color and feeds racial anxieties in local communities.” 
+            br
+            br 
+            | Amazon <a href = "https://www.nytimes.com/2020/06/10/technology/amazon-facial-recognition-backlash.html">recently imposed a moratorium</a> on police use of its facial recognition software, in response to concerns that the software, which regularly misidentifies Black and Brown people, exacerbates biased policing. Yet despite similar <a href = "https://www.vice.com/en_us/article/qvyvzd/amazons-home-security-company-is-turning-everyone-into-cops">concerns</a> that Ring fuels racist profiling and policing, Amazon has added over sixty new partnerships since June 1. 
+            br
+            br
+            | Partnerships, while public knowledge, are often added with minimal announcement or public input—meaning most Americans will never know they are being surveilled. The goal of this dashboard is to make this data more publicly accessible, with the hope that it will increase transparency and accountability over Amazon's police partnership program. 
+            br
+            br
+            .methodology 
+              p.heading METHODOLOGY
+              ul 
+                li Data collection began on July 8, 2020, and the data is refreshed roughly every 24 hours.
+                li Data is collected from an <a href = "https://support.ring.com/hc/en-us/articles/360035402811-Active-Law-Enforcement-Map">active agency map</a> regularly updated by Amazon.
+                li "Video Requests" are updated on a quarterly basis by Amazon Ring, meaning the total number may go down. 
+                li This project is open source and licensed under the MIT License. See the code <a href = "https://github.com/jeffreyshen19/amazon-ring-lea-contracts" target = "_blank">here</a>.
+                li If you would like access to the dataset, please <a href = "mailto:jjshen@mit.edu">email me</a>!
               
         #statistics.columns.is-variable.is-6
           .column.is-3 
@@ -44,7 +52,7 @@ html
                 p.heading Law Enforcement Agencies 
               .column
                 p.statistic.is-size-4#statistic-video-requests 0
-                p.heading Video Requests Made By Law Enforcement
+                p.heading Video Requests Made By Law Enforcement In Past Quarter
               .column
                 p.statistic.is-size-4#statistic-states 0
                 p.heading States With Police-Amazon Contracts

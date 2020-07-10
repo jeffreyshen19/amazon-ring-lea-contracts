@@ -54,11 +54,13 @@ header {
   margin-bottom: 3em; }
 
 #about {
+  column-count: 2;
+  column-gap: 30px;
   margin-bottom: 3em; }
-  #about .column:nth-child(2) {
+  #about .methodology {
     color: #8b8b8b;
     font-size: 0.9em; }
-    #about .column:nth-child(2) li {
+    #about .methodology li {
       margin-bottom: 1rem; }
 
 #statistics > .column:first-child {

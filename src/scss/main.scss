@@ -10,14 +10,17 @@ header{
 }
 
 #about{
-  .column:nth-child(2){
+  column-count: 2;
+  column-gap: 30px;
+  margin-bottom: 3em;
+
+  .methodology{
     color: #8b8b8b;
     font-size: 0.9em;
     li{
       margin-bottom: 1rem;
     }
   }
-  margin-bottom: 3em;
 }
 
 #statistics{
