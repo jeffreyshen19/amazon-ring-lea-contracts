@@ -41,7 +41,7 @@ function drawTimeSeries(data, xExtent, yExtent){
   // Add mouseover
   let bisectDate = d3.bisector(function(d) { return d.date; }).left,
       circle = d3.select("circle"),
-      tooltip = d3.select(".tooltip"),
+      tooltip = svg.select(".tooltip"),
       timeFormat = d3.timeFormat("%B %Y");
 
   svg.select("rect") // Overlay for smooth hover
@@ -100,13 +100,33 @@ function getUpdates(updates){
 }
 
 function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
-  let colorScale = d3.scaleLinear().domain([0, showAgencies ? maxAgencies : maxVideoRequests]).range(["#dedede", "#1f3a93"]);
+  let colorScale = d3.scaleLinear().domain([0, showAgencies ? maxAgencies : maxVideoRequests]).range(["#dedede", "#1f3a93"]),
+      svg = d3.select("#map").select("svg"),
+      tooltip = svg.select(".tooltip");
 
-  d3.select("#map").select("svg").selectAll(".path")
+  const abbrevToName = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"District Of Columbia","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"};
+
+  svg.selectAll(".path")
     .data(data)
     .style("fill", (d) => colorScale(showAgencies ? d.agencies : d.videoRequests))
-    .on("mouseover", function(d){
-      console.log(d);
+    .on("mouseover", function(){
+      tooltip.attr("visibility", "visible");
+    })
+    .on("mouseout", function(){
+      tooltip.attr("visibility", "hidden");
+    })
+    .on("mousemove", function(d){
+      let mouse = d3.mouse(this), width = svg.node().getBBox().width;
+
+      // Tooltip
+      tooltip
+        .attr("x", mouse[0] + 160 > width ? mouse[0] - 170 : mouse[0] + 10)
+        .attr("y", mouse[1] - 25)
+        .select(".box")
+        .html(`
+          <p class = "heading">${abbrevToName[d.state]}</p>
+          <p>${showAgencies ? "Agencies" : "Video Requests"}: ${showAgencies ? d.agencies : d.videoRequests}</p>
+        `);
     });
 
   console.log(data, maxAgencies, maxVideoRequests);

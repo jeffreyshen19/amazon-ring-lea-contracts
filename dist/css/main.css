@@ -38,14 +38,14 @@ h1, h2, h3, h4, h5, h6 {
 #time-series circle {
   fill: #1f3a93; }
 
-#time-series .tooltip div {
-  padding: 10px;
-  font-size: 14px; }
-  #time-series .tooltip div p {
-    line-height: 0.85rem; }
-
 #time-series circle, #time-series .tooltip {
   transition: 0.05s all; }
+
+.tooltip div {
+  padding: 10px;
+  font-size: 14px; }
+  .tooltip div p {
+    line-height: 0.85rem; }
 
 #map .path {
   fill: #f4f4f4; }
