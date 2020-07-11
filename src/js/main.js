@@ -149,7 +149,7 @@ function getTable(agencies){
     `);
 }
 
-$.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
+$.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
   let newAgencyLine = {},
       deactivatedAgencyLine = [], //TODO: add this later
       states = {},
