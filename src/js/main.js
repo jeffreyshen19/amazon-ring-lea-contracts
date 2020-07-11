@@ -130,7 +130,7 @@ function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
     });
 
   d3.select("#scale").select(".right").select("p")
-    .text(`${d3.format(",")(showAgencies ? maxAgencies : maxVideoRequests)} ${showAgencies ? "Agencies" : "Video Requests"}`);
+    .text(d3.format(",")(showAgencies ? maxAgencies : maxVideoRequests));
 }
 
 function getTable(agencies){
