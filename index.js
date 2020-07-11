@@ -3,6 +3,8 @@
   Backend API serving db to frontend
 */
 
+require('dotenv').config();
+
 let express = require("express"),
     mongoose = require("mongoose"),
     Agency = require("./app/models/Agency"),
@@ -13,11 +15,12 @@ let app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 3000,
-      DB_URL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/ring-lea';
+      DB_URL = `mongodb+srv://jjshen:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@cluster0.spv4l.mongodb.net/ring-lea?retryWrites=true&w=majority`;
+
 
 // ** CONNECT TO DB **
 mongoose.connect(DB_URL, function(err, res) {
-  if(err) console.log("ERROR connecting to database");
+  if(err) console.log(err, "ERROR connecting to database");
   else console.log("SUCCESSfully connected to database");
 });
 

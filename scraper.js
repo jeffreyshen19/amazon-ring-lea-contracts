@@ -15,7 +15,7 @@ let mongoose = require("mongoose"),
       apiKey: process.env.GOOGLE_API_KEY
     });
 
-const DB_URL = process.env.DB_URL || 'mongodb://127.0.0.1:27017/ring-lea';
+const DB_URL =  `mongodb+srv://jjshen:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@cluster0.spv4l.mongodb.net/ring-lea?retryWrites=true&w=majority`;
 
 // ** CONNECT TO DB **
 mongoose.connect(DB_URL, function(err, res) {
@@ -39,8 +39,11 @@ let totalRequests = 0,
 
 function getData(){
   return new Promise(function(resolve, reject){
-    request('https://www.google.com/maps/d/kml?forcekml=1&mid=1eYVDPh5itXq5acDT9b0BVeQwmESBa4cB&lid=yvtnOP7RJZU', function (error, response, body) {
-      if(error) reject();
+    request('https://www.google.com/maps/d/kml?forcekml=1&mid=1eYVDPh5itXq5acDT9b0BVeQwmESBa4cB&lid=0lw7Gm89Bzk', function (error, response, body) {
+      if(error) {
+        reject();
+        mongoose.connection.close();
+      }
       else resolve(JSON.parse(convert.xml2json(body, {compact: true})).kml.Document.Placemark);
     });
   });
@@ -72,7 +75,6 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
       address: address,
       state: state,
       activeDate: activeDate,
-      geolocation: {type: 'Point', coordinates: null},
       deactivateDate: null,
       videoRequests: videoRequests
     });
@@ -94,31 +96,7 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
     });
   })
 
-  // 4) Geocode all new data TODO: make this faster
-  console.log("Geocoding " + insert.length + " documents");
-  let addresses = insert.map((d) => d.address + ", USA"),
-      batches = [];
-  const CHUNK_SIZE = 50; // Break addresses into chunks to avoid Google Rate Limit
-
-  function batchGeocode(i) {
-    if(i >= addresses.length) {
-      console.log("Done Geocoding");
-      databaseUpdates();
-    }
-    else geocoder.batchGeocode(addresses.slice(i, i + CHUNK_SIZE)).then(function(data){
-      data.forEach(function(d, j){
-        if(d.error == null && d.value.length) insert[i + j].geolocation = {type: 'Point', coordinates: [d.value[0].latitude, d.value[0].longitude]}
-      });
-
-      setTimeout(function(){
-        batchGeocode(i + CHUNK_SIZE);
-      }, 1000);
-    })
-  }
-
-  batchGeocode(0);
-
-  // 5) Perform database updates
+  // 4) Perform database updates
   function databaseUpdates(){
     console.log("Inserting " + insert.length + " documents");
     console.log("Updating " + update.length + " documents");
@@ -159,4 +137,5 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
     });
   }
 
+  databaseUpdates();
 });
