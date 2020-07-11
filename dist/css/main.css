@@ -78,8 +78,6 @@ header {
   margin-bottom: 3em; }
 
 #about {
-  column-count: 2;
-  column-gap: 30px;
   margin-bottom: 3em; }
   #about .methodology {
     color: #8b8b8b;
