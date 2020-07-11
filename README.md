@@ -10,6 +10,8 @@ These partnerships have been criticized by over [30 civil rights groups](https:/
 
 Amazon [recently imposed a moratorium](https://www.nytimes.com/2020/06/10/technology/amazon-facial-recognition-backlash.html) on police use of its facial recognition software, in response to concerns that the software, which regularly misidentifies Black and Brown people, exacerbates biased policing. Yet despite similar [concerns](https://www.vice.com/en_us/article/qvyvzd/amazons-home-security-company-is-turning-everyone-into-cops) that Ring fuels racist profiling and policing, Amazon has added over sixty new partnerships since June 1.
 
+Moreover, new partnerships are often added with minimal announcement or public input—meaning most Americans will never know they are being surveilled. The goal of this dashboard is to make this data more publicly accessible, with the hope that it will increase transparency and accountability over Amazon's police partnership program. 
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more detail.
