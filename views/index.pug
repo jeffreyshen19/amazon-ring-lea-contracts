@@ -19,7 +19,8 @@ html
       .column.is-8.is-12-mobile
         header.has-text-centered 
           h1.is-size-3 Amazon Ring's Police Partnership Tracker
-          p.heading.is-size-6 Last Updated <span id = "last-updated"></span> Hours Ago
+          p.heading.is-size-6#last-updated Loading Data &nbsp;
+            i.fas.fa-spinner.fa-spin 
           
         #about
           p Amazon Ring, maker of smart video doorbells, is currently partnered with over 1,400 police departments across the U.S., enabling local law enforcement to request video footage from users' Ring devices—often <a href = "https://www.vox.com/recode/2019/10/8/20903536/amazon-ring-doorbell-civil-rights-police-partnerships">without a warrant</a>. Once videos are accessed, police can <a href = "https://www.markey.senate.gov/news/press-releases/senator-markey-investigation-into-amazon-ring-doorbell-reveals-egregiously-lax-privacy-policies-and-civil-rights-protections">store this footage indefinitely</a>, use it to <a href = "https://www.vox.com/recode/2019/10/8/20903536/amazon-ring-doorbell-civil-rights-police-partnerships">target protestors</a>, or freely share this data to other agencies like ICE or the FBI. 
@@ -114,9 +115,4 @@ html
         br  
         br  
         p.heading.has-text-centered.is-size-6 Website by <a href = "https://twitter.com/jeffreyjshen">Jeffrey Shen</a>, 2020.
-
-
-    //- https://act.eff.org/action/tell-amazon-ring-to-end-its-dangerous-police-partnerships      
-    //- https://www.eff.org/deeplinks/2020/06/amazon-ring-must-end-its-dangerous-partnerships-police
-        
     script(src = "./dist/js/main-min.js")

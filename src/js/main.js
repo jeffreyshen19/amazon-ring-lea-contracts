@@ -78,7 +78,7 @@ function drawTimeSeries(data, xExtent, yExtent){
 }
 
 function getSummaryStatistics(data, states, agenciesAddedThisMonth){
-  $("#last-updated").text(Math.round((new Date() - (new Date(data.snapshot.date))) / 3600000));
+  $("#last-updated").text(`Last Updated ${Math.round((new Date() - (new Date(data.snapshot.date))) / 3600000)} Hours Ago`);
   $("#statistic-lea").text(d3.format(",")(data.snapshot.agencies));
   $("#statistic-video-requests").text(d3.format(",")(data.snapshot.videoRequests));
   $("#statistic-states").text(Object.keys(states).length);
