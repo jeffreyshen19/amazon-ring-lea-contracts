@@ -227,7 +227,7 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
   getSummaryStatistics(data, states, agenciesAddedThisMonth);
   getUpdates(updates);
   drawMap(mapData, maxAgencies, maxVideoRequests, true);
-  getTable(data.agencies);
+  getTable(data.agencies.slice(0, 100));
 
   // Add resize handlers
   let resizeEnd;
@@ -236,6 +236,17 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
     resizeEnd = setTimeout(function() {
       drawTimeSeries(newAgencyLine, xExtent, yExtent);
     }, 100);
+  });
+
+  //Add scroll handler for tablet
+  let scrollHeight = d3.select("#table").select("div").node().scrollHeight - 500, dataI = 100;
+
+  $("#table > div").scroll(function() {
+    if($("#table > div").scrollTop() >= scrollHeight) {
+      dataI += 100;
+      getTable(data.agencies.slice(0, Math.min(dataI, data.agencies.length)));
+      scrollHeight = d3.select("#table").select("div").node().scrollHeight - 500;
+    }
   });
 
   // Add button handlers
