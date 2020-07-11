@@ -39,12 +39,14 @@ let totalRequests = 0,
 
 function getData(){
   return new Promise(function(resolve, reject){
-    request('https://www.google.com/maps/d/kml?forcekml=1&mid=1eYVDPh5itXq5acDT9b0BVeQwmESBa4cB&lid=0lw7Gm89Bzk', function (error, response, body) {
-      if(error) {
-        reject();
-        mongoose.connection.close();
-      }
-      else resolve(JSON.parse(convert.xml2json(body, {compact: true})).kml.Document.Placemark);
+    request('https://www.google.com/maps/d/kml?mid=1eYVDPh5itXq5acDT9b0BVeQwmESBa4cB&nl=1&forcekml=1', function (error, response, body) {
+      if(error) reject();
+      let dataURL = JSON.parse(convert.xml2json(body, {compact: true})).kml.Document.NetworkLink.Link.href._cdata;
+      console.log(dataURL);
+      request(dataURL, function (error, response, body) {
+        if(error) reject();
+        else resolve(JSON.parse(convert.xml2json(body, {compact: true})).kml.Document.Folder[0].Placemark);
+      });
     });
   });
 }
@@ -138,4 +140,7 @@ Promise.all([getData(), Agency.find({})]).then((values) => {
   }
 
   databaseUpdates();
-});
+})
+  .catch(function(){
+    mongoose.connection.close();
+  })
