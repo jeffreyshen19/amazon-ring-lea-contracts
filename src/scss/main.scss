@@ -52,3 +52,23 @@ header{
     }
   }
 }
+
+#map{
+  margin-bottom: 2em;
+}
+
+#table{
+  margin: 3em 0;
+
+  div{
+    overflow-y: scroll;
+    max-height: 400px;
+    margin-top: 1em;
+  }
+
+  th{
+    position: sticky;
+    top: -2px;
+    background-color: $gray;
+  }
+}

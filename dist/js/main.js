@@ -133,6 +133,22 @@ function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
     .text(`${d3.format(",")(showAgencies ? maxAgencies : maxVideoRequests)} ${showAgencies ? "Agencies" : "Video Requests"}`);
 }
 
+function getTable(agencies){
+  let timeFormat = d3.timeFormat("%m/%d/%Y"),
+      numberFormat = d3.format(",");
+
+  d3.select("#table").select("tbody").selectAll("tr")
+    .data(agencies)
+    .enter()
+    .append("tr")
+    .html((d) => `
+      <td>${d.name}</td>
+      <td>${d.address}</td>
+      <td>${timeFormat(d.activeDate)}</td>
+      <td>${numberFormat(d.videoRequests)}</td>
+    `);
+}
+
 $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   let newAgencyLine = {},
       deactivatedAgencyLine = [], //TODO: add this later
@@ -211,6 +227,7 @@ $.getJSON("http://127.0.0.1:3000/", function(data){ //TODO: fix this
   getSummaryStatistics(data, states, agenciesAddedThisMonth);
   getUpdates(updates);
   drawMap(mapData, maxAgencies, maxVideoRequests, true);
+  getTable(data.agencies);
 
   // Add resize handlers
   let resizeEnd;

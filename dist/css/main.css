@@ -102,3 +102,17 @@ header {
     #statistics .column:nth-child(3) li .heading {
       color: #1f3a93;
       margin-top: 5px; }
+
+#map {
+  margin-bottom: 2em; }
+
+#table {
+  margin: 3em 0; }
+  #table div {
+    overflow-y: scroll;
+    max-height: 400px;
+    margin-top: 1em; }
+  #table th {
+    position: sticky;
+    top: -2px;
+    background-color: #f4f4f4; }
