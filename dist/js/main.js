@@ -166,9 +166,17 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
 
     // Get total states
     let state = agency.address.split(", ")[1];
-    if(!(state in states)) states[state] = {agencies: 0, videoRequests: 0};
-    states[state].agencies += 1;
-    states[state].videoRequests += agency.videoRequests;
+
+    if(state != null && state.length > 2) { // Convert all full names to abbrev
+      if(state == "Minneapolis") state = "MN";
+      else state = abbrState(state, 'abbr');
+    }
+
+    if(state != null){
+      if(!(state in states)) states[state] = {agencies: 0, videoRequests: 0};
+      states[state].agencies += 1;
+      states[state].videoRequests += agency.videoRequests;
+    }
 
     // Add recent updates
     if (agency.activeDate.getFullYear() >= 2020 && agency.deactivateDate == null) updates.push({
