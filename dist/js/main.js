@@ -186,12 +186,12 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
   });
 
   // Add more updates
-  data.snapshot.obsolete.forEach(function(agency){
-    updates.push({
-      "date": new Date(data.snapshot.date),
-      "text": `${agency.name} (${agency.address.split(", ")[1]}) removed their contract with Ring`
-    });
-  });
+  // data.snapshot.obsolete.forEach(function(agency){
+  //   updates.push({
+  //     "date": new Date(data.snapshot.date),
+  //     "text": `${agency.name} (${agency.address.split(", ")[1]}) removed their contract with Ring`
+  //   });
+  // });
   data.snapshot.update.forEach(function(agency){
     if(agency.videoRequests > agency.prevVideoRequests) updates.push({
       "date": new Date(data.snapshot.date),
