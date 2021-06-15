@@ -16,6 +16,7 @@
     "mongoose": "^5.9.22",
     "node-geocoder": "^3.27.0",
     "request": "^2.88.2",
+    "selenium-webdriver": "^4.0.0-beta.4",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
