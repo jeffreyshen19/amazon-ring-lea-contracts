@@ -94,7 +94,7 @@ async function scrape(){
 
     // 2) Iterate through new data, determine which to update and insert
     for (const agency of newData){
-      let name = "_text" in agency.address ? agency.address._text : agency.address._cdata,
+      let name = "_text" in agency.name ? agency.name._text : agency.name._cdata,
           address = "_text" in agency.address ? agency.address._text : agency.address._cdata;
           state = address.split(",")[1].trim(),
           activeDate = new Date(agency.ExtendedData.Data[1].value._text),
