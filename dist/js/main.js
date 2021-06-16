@@ -86,7 +86,7 @@ function getSummaryStatistics(data, states, agenciesAddedThisMonth){
 }
 
 function getUpdates(updates){
-  let dateFormat = d3.timeFormat("%m/%d/%Y")
+  let dateFormat = (d) => moment(d).tz("UTC").format("MM/DD/YYYY");
   d3.select("#updates").selectAll("li")
     .data(updates)
     .enter()
@@ -134,7 +134,7 @@ function drawMap(data, maxAgencies, maxVideoRequests, showAgencies){
 }
 
 function getTable(agencies){
-  let timeFormat = d3.timeFormat("%m/%d/%Y"),
+  let timeFormat = (d) => moment(d).tz("UTC").format("MM/DD/YYYY"),
       numberFormat = d3.format(",");
 
   d3.select("#table").select("tbody").selectAll("tr")
@@ -162,6 +162,7 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
   // Preprocess Data
   data.agencies.forEach(function(agency){
     agency.activeDate = new Date(agency.activeDate);
+
     let monthYear = new Date(agency.activeDate.getFullYear(), agency.activeDate.getMonth());
 
     // Group activity by month
