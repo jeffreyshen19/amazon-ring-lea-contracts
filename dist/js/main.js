@@ -155,6 +155,8 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
       states = {},
       updates = [];
 
+  data.agencies = data.agencies.sort();
+
   // Preprocess Data
   data.agencies.forEach(function(agency){
     agency.activeDate = new Date(agency.activeDate);

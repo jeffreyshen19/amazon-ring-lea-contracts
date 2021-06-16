@@ -9,7 +9,7 @@ let agencySchema = new Schema({
   deactivateDate: Date, // Roughly when the contract was deactived, null if not
   videoRequests: Number, // Number of times LEA has used Neighbors App to request video this quarter
   profile: String // URL for agency page
-});
+}, { strict: false });
 
 
 module.exports = mongoose.model('Agency', agencySchema);
