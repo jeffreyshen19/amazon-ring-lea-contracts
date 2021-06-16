@@ -7,7 +7,8 @@ let agencySchema = new Schema({
   city: String,
   activeDate: Date, // When the contract was activated
   deactivateDate: Date, // Roughly when the contract was deactived, null if not
-  videoRequests: Number // Number of times LEA has used Neighbors App to request video this quarter
+  videoRequests: Number, // Number of times LEA has used Neighbors App to request video this quarter
+  profile: String // URL for agency page
 });
 
 
