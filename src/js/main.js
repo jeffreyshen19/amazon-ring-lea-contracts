@@ -142,7 +142,7 @@ function getTable(agencies){
     .enter()
     .append("tr")
     .html((d) => `
-      <td>${d.name}</td>
+      <td><a href = '${d.profile}'>${d.name}</a></td>
       <td>${d.address}</td>
       <td>${timeFormat(d.activeDate)}</td>
       <td>${numberFormat(d.videoRequests)}</td>
@@ -192,12 +192,12 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
   //     "text": `${agency.name} (${agency.address.split(", ")[1]}) removed their contract with Ring`
   //   });
   // });
-  data.snapshot.update.forEach(function(agency){
-    if(agency.videoRequests > agency.prevVideoRequests) updates.push({
-      "date": new Date(data.snapshot.date),
-      "text": `${agency.name} (${agency.address.split(", ")[1]}) requested ${agency.videoRequests - agency.prevVideoRequests} video${agency.videoRequests - agency.prevVideoRequests == 1 ? "" : "s"}`
-    });
-  });
+  // data.snapshot.update.forEach(function(agency){
+  //   if(agency.videoRequests > agency.prevVideoRequests) updates.push({
+  //     "date": new Date(data.snapshot.date),
+  //     "text": `${agency.name} (${agency.address.split(", ")[1]}) requested ${agency.videoRequests - agency.prevVideoRequests} video${agency.videoRequests - agency.prevVideoRequests == 1 ? "" : "s"}`
+  //   });
+  // });
   updates = updates.sort(function(a, b){return b.date - a.date}).slice(0, 4); // Get the four most recent updates
 
   let today = new Date(),

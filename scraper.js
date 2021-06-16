@@ -145,7 +145,7 @@ async function scrape(){
 
       if(insert.length) promises.push(Agency.insertMany(insert));
       if(update.length) update.forEach(function(d){
-        promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {videoRequests: d.videoRequests}));
+        promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {videoRequests: d.videoRequests, profile: d.profile}));
       });
       if(obsolete.length) obsolete.forEach(function(d){
         promises.push(Agency.findOneAndUpdate({name: d.name, address: d.address}, {deactivateDate: d.deactivateDate}));
