@@ -155,7 +155,9 @@ $.getJSON("https://ring-lea-tracker.herokuapp.com/", function(data){
       states = {},
       updates = [];
 
-  data.agencies = data.agencies.sort();
+  data.agencies = data.agencies.sort(function(a, b) {
+    return a.name - b.name;
+  });
 
   // Preprocess Data
   data.agencies.forEach(function(agency){
