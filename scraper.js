@@ -69,9 +69,9 @@ async function getVideoRequest(url) {
   await driver.get(url);
   try{
     await driver.wait(function () {
-      return driver.findElements(By.className('Bcbby')).then(found => !!found.length);
+      return driver.findElements(By.xpath("//*[contains(text(),'Total Video Requests')]")).then(found => !!found.length);
     }, 3000);
-    let element = await driver.findElement(By.className('Bcbby'));
+    let element = await driver.findElement(By.xpath("//*[contains(text(),'Total Video Requests')]"));
     let text = await element.getText();
     let numVideoRequests = parseInt(text.split(":")[1].trim());
     return numVideoRequests;
