@@ -67,7 +67,6 @@ function getData(){
 // Helper function to extract video requests (Ring updated website so map only shows URL that contains video requests, need to visit this page and extract_
 async function getVideoRequest(url) {
   await driver.get(url);
-  console.log("got here");
   try{
     await driver.wait(function () {
       return driver.findElements(By.xpath("//*[contains(text(),'Request For Assistance:')]")).then(found => !!found.length);
