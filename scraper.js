@@ -67,13 +67,22 @@ function getData(){
 // Helper function to extract video requests (Ring updated website so map only shows URL that contains video requests, need to visit this page and extract_
 async function getVideoRequest(url) {
   await driver.get(url);
+  console.log("got here");
   try{
     await driver.wait(function () {
-      return driver.findElements(By.xpath("//*[contains(text(),'Video Requests:')]")).then(found => !!found.length);
+      return driver.findElements(By.xpath("//*[contains(text(),'Request For Assistance:')]")).then(found => !!found.length);
     }, 3000);
-    let element = await driver.findElement(By.xpath("//*[contains(text(),'Video Requests:')]"));
-    let text = await element.getText();
-    let numVideoRequests = parseInt(text.split(":")[1].trim());
+    let categories = ["Request For Assistance", "Crime", "Safety", "Animals", "Environmental", "Community"];
+    let promises = categories.map(category => driver.findElement(By.xpath("//*[contains(text(),'" + category + ":')]")));
+    let elements = await Promise.all(promises);
+
+    let numVideoRequests = 0;
+
+    for(let i = 0; i < elements.length; i++){
+      let text = await elements[i].getText();
+      numVideoRequests += parseInt(text.split(":")[1].trim());
+    }
+
     return numVideoRequests;
   }
   catch(error){
